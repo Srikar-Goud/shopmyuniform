@@ -27,10 +27,10 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
 
   const [filters, setFilters] = useState({
-    q: searchParams.get("q") || "",
-    school: "",
-    category: "",
-  });
+  q: searchParams.get("q") || "",
+  school: searchParams.get("school") || "",
+  category: searchParams.get("category") || "",
+});
 
   useEffect(() => {
     api
@@ -178,7 +178,7 @@ export default function Home() {
           QUICK SCHOOL SEARCH
       ====================================================== */}
 
-      <section className="relative z-10 -mt-8 px-5">
+      <section id="schools" className="relative z-10 -mt-8 px-5">
 
         <div className="mx-auto max-w-6xl rounded-2xl bg-white p-4 shadow-xl">
 
@@ -254,7 +254,7 @@ export default function Home() {
           CATEGORIES
       ====================================================== */}
 
-      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+      <section id="products" className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
 
         <div className="mb-8 text-center">
 

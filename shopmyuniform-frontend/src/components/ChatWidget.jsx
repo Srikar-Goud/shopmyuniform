@@ -58,9 +58,10 @@ export default function ChatWidget() {
   return (
     <>
       <button
+      data-chat-widget
         onClick={() => setOpen((o) => !o)}
-        className="fixed bottom-5 right-5 z-40 grid h-14 w-14 place-items-center rounded-full bg-maroon text-cream shadow-lg transition hover:bg-maroon/90"
-        aria-label="Open customer support chat"
+        className="fixed bottom-6 right-6 z-[60] grid h-14 w-14 place-items-center rounded-full bg-maroon text-cream shadow-lg transition hover:bg-maroon/90"
+        aria-label="Open customer support chat" 
       >
         {open ? (
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="h-6 w-6">
@@ -74,13 +75,31 @@ export default function ChatWidget() {
       </button>
 
       {open && (
-        <div className="fixed bottom-24 right-5 z-40 flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-xl border border-navy/10 bg-white shadow-2xl">
+        <div className="fixed bottom-24 right-6 z-[60] flex h-[32rem] w-[22rem] flex-col overflow-hidden rounded-xl border border-navy/10 bg-white shadow-2xl">
           <div className="flex items-center justify-between border-b border-navy/10 bg-navy px-4 py-3 text-cream">
             <div>
               <p className="text-sm font-semibold">ShopMyUniform Support</p>
               <p className="text-[11px] text-cream/70">Ask about orders, sizing, delivery & returns</p>
             </div>
           </div>
+          <div className="fixed bottom-6 right-6 z-[60] flex items-center gap-3">
+
+  {!open && (
+    <div className="hidden rounded-full bg-white px-4 py-2 text-xs font-semibold text-navy shadow-lg sm:block">
+      Need help? Ask our AI 🤖
+    </div>
+  )}
+
+  <button
+    data-chat-widget
+    onClick={() => setOpen((o) => !o)}
+    className="grid h-14 w-14 place-items-center rounded-full bg-maroon text-cream shadow-xl transition hover:scale-105 hover:bg-maroon/90"
+    aria-label="Open customer support chat"
+  >
+    {/* existing SVG */}
+  </button>
+
+</div>
 
           <div className="flex-1 space-y-3 overflow-y-auto px-4 py-4">
             {messages.map((m, i) => (
