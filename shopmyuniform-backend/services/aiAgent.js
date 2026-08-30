@@ -14,7 +14,7 @@ const gemini = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
-const MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
+const MODEL = process.env.GEMINI_MODEL || "gemini-3.1-flash-lite";
 
 // ---------------------------------------------------------------------------
 // Gemini function declarations
