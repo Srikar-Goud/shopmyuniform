@@ -8,52 +8,179 @@ export default function Navbar() {
   const navigate = useNavigate();
 
   return (
-    <header className="sticky top-0 z-30 border-b border-navy/10 bg-cream/95 backdrop-blur">
-      <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4">
-        <Link to="/" className="flex items-center gap-2">
-          <span className="grid h-9 w-9 place-items-center rounded-full bg-navy text-cream font-display text-sm font-semibold">
-            SU
-          </span>
-          <span className="font-display text-xl font-semibold tracking-tight text-navy">
-            ShopMy<span className="text-maroon">Uniform</span>
-          </span>
-        </Link>
+    <header className="sticky top-0 z-50 bg-white shadow-sm">
 
-        <nav className="hidden items-center gap-6 text-sm font-medium text-navy/80 md:flex">
-          <Link to="/" className="hover:text-navy">Catalog</Link>
-          {user && <Link to="/orders" className="hover:text-navy">My Orders</Link>}
-          {user && <Link to="/profile" className="hover:text-navy">Profile</Link>}
-        </nav>
+      {/* TOP INFO BAR */}
+      <div className="hidden bg-cream px-5 py-2 text-center text-xs font-semibold text-navy/70 sm:block">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <span>Free delivery on orders over ₹999</span>
+          <span>School uniforms made simple</span>
+          <span>Easy returns & exchanges</span>
+        </div>
+      </div>
 
-        <div className="flex items-center gap-4">
-          <Link to="/cart" className="relative text-navy" aria-label="Cart">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-6 w-6">
-              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 1.994-4.693 2.602-7.152.078-.312-.16-.598-.482-.598H5.106M7.5 14.25L5.106 5.272M6.75 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm11.25 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
-            </svg>
+      {/* MAIN HEADER */}
+      <div className="bg-navy text-cream">
+        <div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-4">
+
+          {/* LOGO */}
+          <Link
+            to="/"
+            className="flex shrink-0 items-center gap-2"
+          >
+            <span className="grid h-10 w-10 place-items-center rounded-full bg-mustard font-display text-sm font-bold text-navy">
+              SU
+            </span>
+
+            <span className="hidden font-display text-xl font-bold tracking-tight sm:block">
+              ShopMy<span className="text-mustard">Uniform</span>
+            </span>
+          </Link>
+
+
+          {/* SCHOOL SEARCH */}
+          <div className="relative flex-1">
+
+            <input
+              type="text"
+              placeholder="Start here by searching for your school"
+              className="
+                w-full rounded-full
+                border-0
+                bg-white
+                px-5 py-3
+                pr-12
+                text-sm
+                text-navy
+                shadow-sm
+                outline-none
+                placeholder:text-navy/45
+                focus:ring-2
+                focus:ring-mustard
+              "
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  navigate(`/?q=${encodeURIComponent(e.target.value)}`);
+                }
+              }}
+            />
+
+            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xl text-navy">
+              🔍
+            </span>
+
+          </div>
+
+
+          {/* ACCOUNT */}
+          <Link
+            to={user ? "/profile" : "/login"}
+            className="hidden text-center transition hover:text-mustard sm:block"
+          >
+            <div className="text-xl">👤</div>
+            <span className="text-[11px]">
+              {user ? "Account" : "Sign in"}
+            </span>
+          </Link>
+
+
+          {/* CART */}
+          <Link
+            to="/cart"
+            className="relative rounded-full bg-white px-4 py-2 text-sm font-bold text-navy transition hover:bg-mustard"
+          >
+            🛍️ ₹
+            <span className="ml-1">Cart</span>
+
             {itemCount > 0 && (
-              <span className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-maroon text-[10px] font-bold text-cream">
+              <span className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-maroon text-[10px] text-white">
                 {itemCount}
               </span>
             )}
           </Link>
 
-          {user ? (
+        </div>
+      </div>
+
+
+      {/* NAVIGATION */}
+      <nav className="border-b border-navy/10 bg-white">
+        <div className="mx-auto flex max-w-7xl items-center justify-center gap-8 overflow-x-auto px-5 py-3 text-sm font-semibold text-navy/80">
+
+          <Link
+            to="/"
+            className="whitespace-nowrap transition hover:text-maroon"
+          >
+            Find Your School
+          </Link>
+
+          <Link
+            to="/"
+            className="whitespace-nowrap transition hover:text-maroon"
+          >
+            School Uniforms
+          </Link>
+
+          <Link
+            to="/"
+            className="whitespace-nowrap transition hover:text-maroon"
+          >
+            Accessories
+          </Link>
+
+          <Link
+            to="/"
+            className="whitespace-nowrap transition hover:text-maroon"
+          >
+            Footwear
+          </Link>
+
+          <Link
+            to="/"
+            className="whitespace-nowrap transition hover:text-maroon"
+          >
+            New Arrivals
+          </Link>
+
+          {user && (
+            <Link
+              to="/orders"
+              className="whitespace-nowrap transition hover:text-maroon"
+            >
+              My Orders
+            </Link>
+          )}
+
+          <button
+            onClick={() => {
+              const chatButton = document.querySelector(
+                "[data-chat-widget]"
+              );
+
+              if (chatButton) {
+                chatButton.click();
+              }
+            }}
+            className="whitespace-nowrap text-maroon transition hover:text-navy"
+          >
+            🤖 AI Support
+          </button>
+
+          {user && (
             <button
               onClick={() => {
                 logout();
                 navigate("/login");
               }}
-              className="btn-secondary !px-3 !py-1.5 text-xs"
+              className="whitespace-nowrap text-navy/50 hover:text-maroon"
             >
               Log out
             </button>
-          ) : (
-            <Link to="/login" className="btn-primary !px-4 !py-1.5 text-xs">
-              Sign in
-            </Link>
           )}
+
         </div>
-      </div>
+      </nav>
+
     </header>
   );
 }

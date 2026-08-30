@@ -14,18 +14,258 @@ body {
   @apply bg-mustard/40;
 }
 
+/* --------------------------------------------------
+   BUTTONS
+-------------------------------------------------- */
+
 .btn-primary {
-  @apply inline-flex items-center justify-center gap-2 rounded-md bg-navy px-5 py-2.5 text-sm font-semibold text-cream transition hover:bg-navy-light focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mustard disabled:opacity-50 disabled:cursor-not-allowed;
+  @apply inline-flex items-center justify-center gap-2 rounded-xl
+    bg-navy px-5 py-3 text-sm font-semibold text-cream
+    transition-all duration-300
+    hover:-translate-y-0.5
+    hover:bg-navy-light
+    hover:shadow-lg
+    focus-visible:outline
+    focus-visible:outline-2
+    focus-visible:outline-offset-2
+    focus-visible:outline-mustard
+    disabled:cursor-not-allowed
+    disabled:opacity-50;
 }
 
 .btn-secondary {
-  @apply inline-flex items-center justify-center gap-2 rounded-md border border-navy/20 bg-white px-5 py-2.5 text-sm font-semibold text-navy transition hover:border-navy/40 hover:bg-navy/5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mustard;
+  @apply inline-flex items-center justify-center gap-2 rounded-xl
+    border border-navy/20
+    bg-white
+    px-5 py-3
+    text-sm font-semibold
+    text-navy
+    transition-all duration-300
+    hover:-translate-y-0.5
+    hover:border-navy/40
+    hover:bg-navy/5
+    hover:shadow-md;
 }
+
+/* --------------------------------------------------
+   INPUTS
+-------------------------------------------------- */
 
 .input-field {
-  @apply w-full rounded-md border border-navy/20 bg-white px-3.5 py-2.5 text-sm text-navy-dark placeholder:text-navy/40 focus:border-navy focus:outline-none focus:ring-1 focus:ring-navy;
+  @apply w-full rounded-xl
+    border border-navy/15
+    bg-white
+    px-3.5 py-2.5
+    text-sm
+    text-navy-dark
+    placeholder:text-navy/40
+    transition
+    focus:border-navy
+    focus:outline-none
+    focus:ring-2
+    focus:ring-navy/10;
 }
 
+/* --------------------------------------------------
+   HOMEPAGE
+-------------------------------------------------- */
+
+.section-label {
+  @apply text-xs font-bold uppercase tracking-[0.2em] text-mustard;
+}
+
+.section-title {
+  @apply mt-2 text-2xl font-bold text-navy sm:text-3xl;
+}
+
+/* --------------------------------------------------
+   HERO ANIMATION
+-------------------------------------------------- */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.8s ease-out both;
+}
+
+.hero-image-wrap {
+  animation: fadeUp 1s ease-out 0.15s both;
+}
+
+.hero-image {
+  @apply w-full rounded-3xl border border-white/10 shadow-2xl;
+
+  transition:
+    transform 0.6s ease,
+    box-shadow 0.6s ease;
+}
+
+.hero-image:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.3);
+}
+
+/* --------------------------------------------------
+   CATEGORY CARDS
+-------------------------------------------------- */
+
+.category-card {
+  @apply flex flex-col items-center
+    rounded-2xl
+    border border-navy/10
+    bg-white
+    px-3 py-6
+    shadow-sm
+    transition-all
+    duration-300;
+}
+
+.category-card:hover {
+  @apply -translate-y-1 shadow-xl;
+}
+
+.category-icon {
+  @apply flex h-14 w-14 items-center justify-center
+    rounded-2xl
+    bg-cream
+    text-3xl
+    transition-transform
+    duration-300;
+}
+
+/* --------------------------------------------------
+   SCHOOL CARDS
+-------------------------------------------------- */
+
+.school-card {
+  @apply rounded-2xl
+    border border-white/10
+    bg-white/5
+    p-5
+    text-left
+    transition-all
+    duration-300;
+}
+
+.school-card:hover {
+  @apply -translate-y-1 bg-white/10 shadow-xl;
+}
+
+/* --------------------------------------------------
+   PRODUCT CARD ANIMATION
+-------------------------------------------------- */
+
+.product-card {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
+}
+
+/* --------------------------------------------------
+   BADGES
+-------------------------------------------------- */
+
 .badge {
-  @apply inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold;
+  @apply inline-flex items-center
+    rounded-full
+    px-2.5 py-0.5
+    text-xs
+    font-semibold;
+}
+
+/* --------------------------------------------------
+   ACCESSIBILITY
+-------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+/* =========================================
+   SHOPMYUNIFORM HOMEPAGE
+========================================= */
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.8s ease-out both;
+}
+
+
+/* CATEGORY CARDS */
+
+.category-card {
+  @apply flex flex-col items-center rounded-2xl
+    border border-navy/10
+    bg-white
+    px-3 py-6
+    shadow-sm
+    transition-all duration-300;
+}
+
+.category-card:hover {
+  @apply -translate-y-1 shadow-xl;
+}
+
+.category-icon {
+  @apply flex h-14 w-14 items-center justify-center
+    rounded-2xl bg-cream text-3xl;
+}
+
+
+/* SCHOOL CARDS */
+
+.school-card {
+  @apply rounded-2xl
+    border border-white/10
+    bg-white/5
+    p-5
+    transition-all duration-300;
+}
+
+.school-card:hover {
+  @apply -translate-y-1 bg-white/10 shadow-xl;
+}
+
+
+/* PRODUCT CARDS */
+
+.product-card {
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-6px);
 }
