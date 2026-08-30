@@ -1,4 +1,5 @@
 import { Routes, Route } from "react-router-dom";
+
 import Navbar from "./components/Navbar";
 import ChatWidget from "./components/ChatWidget";
 import ProtectedRoute from "./components/ProtectedRoute";
@@ -14,16 +15,37 @@ import Checkout from "./pages/Checkout";
 import Orders from "./pages/Orders";
 import OrderDetail from "./pages/OrderDetail";
 
+
 export default function App() {
   return (
     <div className="min-h-screen bg-cream">
+
       <Navbar />
+
       <main>
+
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/products/:id" element={<ProductDetail />} />
+
+          <Route
+            path="/"
+            element={<Home />}
+          />
+
+          <Route
+            path="/login"
+            element={<Login />}
+          />
+
+          <Route
+            path="/register"
+            element={<Register />}
+          />
+
+          <Route
+            path="/products/:id"
+            element={<ProductDetail />}
+          />
+
           <Route
             path="/profile"
             element={
@@ -32,6 +54,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/cart"
             element={
@@ -40,6 +63,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/checkout"
             element={
@@ -48,6 +72,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/orders"
             element={
@@ -56,6 +81,7 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="/orders/:id"
             element={
@@ -64,10 +90,15 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+
         </Routes>
+
       </main>
+
       <Footer />
+
       <ChatWidget />
+
     </div>
   );
 }

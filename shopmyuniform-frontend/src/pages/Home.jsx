@@ -254,7 +254,7 @@ export default function Home() {
           CATEGORIES
       ====================================================== */}
 
-      <section id="products" className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
+      <section className="mx-auto max-w-7xl px-5 py-16 sm:px-8">
 
         <div className="mb-8 text-center">
 

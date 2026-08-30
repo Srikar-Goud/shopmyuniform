@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
@@ -7,28 +8,72 @@ export default function Navbar() {
   const { itemCount } = useCart();
   const navigate = useNavigate();
 
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+
+    const value = search.trim();
+
+    if (!value) return;
+
+    setOpen(false);
+
+    navigate(`/?q=${encodeURIComponent(value)}`);
+
+    setTimeout(() => {
+      document
+        .getElementById("products")
+        ?.scrollIntoView({
+          behavior: "smooth",
+        });
+    }, 150);
+  };
+
+  const handleCategory = () => {
+    setOpen(false);
+
+    setTimeout(() => {
+      document
+        .getElementById("categories")
+        ?.scrollIntoView({
+          behavior: "smooth",
+        });
+    }, 100);
+  };
+
   const handleLogout = () => {
     logout();
+    setOpen(false);
     navigate("/login");
   };
 
   return (
-    <header className="sticky top-0 z-50 bg-white shadow-sm">
+    <>
+      {/* =========================
+          TOP BAR
+      ========================== */}
 
-      {/* TOP INFO BAR */}
-      <div className="hidden bg-cream px-5 py-2 text-center text-xs font-semibold text-navy/70 sm:block">
-        <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <span>Free delivery on orders over ₹999</span>
-          <span>School uniforms made simple</span>
-          <span>Easy returns & exchanges</span>
-        </div>
-      </div>
+      <header className="sticky top-0 z-50 bg-navy text-cream shadow-lg">
 
-      {/* MAIN HEADER */}
-      <div className="bg-navy text-cream">
-        <div className="mx-auto flex max-w-7xl items-center gap-4 px-5 py-4">
+        <div className="flex items-center gap-4 px-4 py-3 sm:px-6">
+
+          {/* HAMBURGER */}
+
+          <button
+            onClick={() => setOpen(true)}
+            className="flex h-11 w-11 shrink-0 flex-col items-center justify-center gap-1.5 rounded-xl bg-white/10 transition hover:bg-white/20"
+            aria-label="Open menu"
+          >
+            <span className="h-0.5 w-6 rounded bg-white" />
+            <span className="h-0.5 w-6 rounded bg-white" />
+            <span className="h-0.5 w-6 rounded bg-white" />
+          </button>
+
 
           {/* LOGO */}
+
           <Link
             to="/"
             className="flex shrink-0 items-center gap-2"
@@ -37,202 +82,268 @@ export default function Navbar() {
               SU
             </span>
 
-            <span className="hidden font-display text-xl font-bold tracking-tight sm:block">
+            <span className="hidden font-display text-xl font-bold sm:block">
               ShopMy<span className="text-mustard">Uniform</span>
             </span>
           </Link>
 
+
           {/* SEARCH */}
-          <div className="relative flex-1">
+
+          <form
+            onSubmit={handleSearch}
+            className="relative flex-1"
+          >
+
             <input
               type="text"
-              placeholder="Start here by searching for your school"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search your school or uniform..."
               className="
-                w-full rounded-full
+                w-full
+                rounded-full
                 border-0
                 bg-white
-                px-5 py-3
+                px-5
+                py-3
                 pr-12
                 text-sm
                 text-navy
-                shadow-sm
                 outline-none
-                placeholder:text-navy/45
+                placeholder:text-navy/40
                 focus:ring-2
                 focus:ring-mustard
               "
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  const value = e.target.value.trim();
-
-                  if (value) {
-                    navigate(`/?q=${encodeURIComponent(value)}`);
-                  }
-                }
-              }}
             />
 
-            <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-xl text-navy">
+            <button
+              type="submit"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-xl text-navy"
+            >
               🔍
-            </span>
-          </div>
+            </button>
 
-          {/* RIGHT ACTIONS */}
-          <div className="flex shrink-0 items-center gap-2">
+          </form>
 
-            {/* ACCOUNT */}
-            <Link
-              to={user ? "/profile" : "/login"}
-              className="hidden rounded-xl px-3 py-2 text-center transition hover:bg-white/10 sm:block"
-            >
-              <div className="text-lg">👤</div>
-              <span className="text-[11px]">
-                {user ? "Account" : "Sign in"}
+
+          {/* CART */}
+
+          <Link
+            to="/cart"
+            className="relative grid h-11 w-11 shrink-0 place-items-center rounded-full bg-white text-lg text-navy transition hover:bg-mustard"
+          >
+            🛒
+
+            {itemCount > 0 && (
+              <span className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-maroon text-[10px] font-bold text-white">
+                {itemCount}
               </span>
-            </Link>
-
-            {/* ORDERS */}
-            {user && (
-              <Link
-                to="/orders"
-                className="hidden rounded-xl px-3 py-2 text-center transition hover:bg-white/10 md:block"
-              >
-                <div className="text-lg">📦</div>
-                <span className="text-[11px]">
-                  Orders
-                </span>
-              </Link>
             )}
+          </Link>
 
-            {/* CART */}
-            <Link
-              to="/cart"
-              className="relative rounded-full bg-white px-4 py-2 text-sm font-bold text-navy transition hover:bg-mustard"
-            >
-              🛍️
-              <span className="ml-1 hidden sm:inline">
-                Cart
-              </span>
-
-              {itemCount > 0 && (
-                <span className="absolute -right-2 -top-2 grid h-5 w-5 place-items-center rounded-full bg-maroon text-[10px] text-white">
-                  {itemCount}
-                </span>
-              )}
-            </Link>
-
-            {/* CHECKOUT */}
-            {user && itemCount > 0 && (
-              <Link
-                to="/checkout"
-                className="
-                  hidden rounded-full
-                  bg-mustard
-                  px-4 py-2
-                  text-sm font-bold
-                  text-navy
-                  transition
-                  hover:brightness-95
-                  lg:block
-                "
-              >
-                Checkout →
-              </Link>
-            )}
-
-            {/* LOGOUT */}
-            {user && (
-              <button
-                onClick={handleLogout}
-                className="
-                  hidden
-                  rounded-full
-                  border border-white/20
-                  px-4 py-2
-                  text-sm
-                  font-semibold
-                  text-white/80
-                  transition
-                  hover:border-mustard
-                  hover:text-mustard
-                  sm:block
-                "
-              >
-                Log out
-              </button>
-            )}
-
-          </div>
         </div>
-      </div>
 
-      {/* NAVIGATION */}
-      <nav className="border-b border-navy/10 bg-white">
-        <div className="mx-auto flex max-w-7xl items-center justify-center gap-7 overflow-x-auto px-5 py-3 text-sm font-semibold text-navy/80">
+      </header>
+
+
+      {/* =========================
+          BACKDROP
+      ========================== */}
+
+      {open && (
+        <div
+          onClick={() => setOpen(false)}
+          className="fixed inset-0 z-[60] bg-black/50"
+        />
+      )}
+
+
+      {/* =========================
+          SIDEBAR
+      ========================== */}
+
+      <aside
+        className={`
+          fixed
+          left-0
+          top-0
+          z-[70]
+          flex
+          h-screen
+          w-72
+          flex-col
+          bg-navy
+          text-white
+          shadow-2xl
+          transition-transform
+          duration-300
+          ${open ? "translate-x-0" : "-translate-x-full"}
+        `}
+      >
+
+        {/* SIDEBAR HEADER */}
+
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-5">
 
           <Link
-            to="/#schools"
-            className="whitespace-nowrap transition hover:text-maroon"
+            to="/"
+            onClick={() => setOpen(false)}
+            className="flex items-center gap-3"
           >
-            Find Your School
+
+            <span className="grid h-11 w-11 place-items-center rounded-full bg-mustard font-display font-bold text-navy">
+              SU
+            </span>
+
+            <div>
+              <div className="font-display text-lg font-bold">
+                ShopMy<span className="text-mustard">Uniform</span>
+              </div>
+
+              <p className="text-[10px] uppercase tracking-wider text-white/40">
+                School uniforms
+              </p>
+            </div>
+
           </Link>
 
-          <Link
-            to="/#products"
-            className="whitespace-nowrap transition hover:text-maroon"
+
+          {/* CLOSE */}
+
+          <button
+            onClick={() => setOpen(false)}
+            className="text-2xl text-white/60 transition hover:text-white"
           >
-            School Uniforms
-          </Link>
+            ×
+          </button>
+
+        </div>
+
+
+        {/* =========================
+            MENU
+        ========================== */}
+
+        <nav className="flex-1 p-4">
+
+          {/* HOME */}
 
           <Link
-            to="/?category=Accessory#products"
-            className="whitespace-nowrap transition hover:text-maroon"
+            to="/"
+            onClick={() => setOpen(false)}
+            className="mb-2 flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
           >
-            Accessories
+            <span className="text-xl">🏠</span>
+            <span>Home</span>
           </Link>
 
-          <Link
-            to="/?category=Shoes#products"
-            className="whitespace-nowrap transition hover:text-maroon"
-          >
-            Footwear
-          </Link>
 
-          <Link
-            to="/#products"
-            className="whitespace-nowrap transition hover:text-maroon"
-          >
-            New Arrivals
-          </Link>
+          {/* ORDERS */}
 
           {user && (
             <Link
               to="/orders"
-              className="whitespace-nowrap transition hover:text-maroon"
+              onClick={() => setOpen(false)}
+              className="mb-2 flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
             >
-              My Orders
+              <span className="text-xl">📦</span>
+              <span>My Orders</span>
             </Link>
           )}
 
-          {/* AI SUPPORT */}
-          <button
-            onClick={() => {
-              const chatButton = document.querySelector(
-                "[data-chat-widget]"
-              );
 
-              if (chatButton) {
-                chatButton.click();
-              }
-            }}
-            className="whitespace-nowrap text-maroon transition hover:text-navy"
+          {/* CART */}
+
+          <Link
+            to="/cart"
+            onClick={() => setOpen(false)}
+            className="mb-2 flex items-center gap-4 rounded-xl px-4 py-3 text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
           >
-            🤖 AI Support
+
+            <span className="text-xl">🛒</span>
+
+            <span className="flex-1">
+              My Cart
+            </span>
+
+            {itemCount > 0 && (
+              <span className="rounded-full bg-mustard px-2 py-0.5 text-xs font-bold text-navy">
+                {itemCount}
+              </span>
+            )}
+
+          </Link>
+
+
+          {/* CATEGORY */}
+
+          <button
+            onClick={handleCategory}
+            className="mb-2 flex w-full items-center gap-4 rounded-xl px-4 py-3 text-left text-sm font-semibold text-white/80 transition hover:bg-white/10 hover:text-white"
+          >
+            <span className="text-xl">🏷️</span>
+            <span>Shop by Category</span>
           </button>
 
-        </div>
-      </nav>
+        </nav>
 
-    </header>
+
+        {/* =========================
+            ACCOUNT
+        ========================== */}
+
+        <div className="border-t border-white/10 p-4">
+
+          {user ? (
+            <>
+              <Link
+                to="/profile"
+                onClick={() => setOpen(false)}
+                className="mb-2 flex items-center gap-3 rounded-xl p-3 transition hover:bg-white/10"
+              >
+
+                <div className="grid h-10 w-10 place-items-center rounded-full bg-mustard text-lg text-navy">
+                  👤
+                </div>
+
+                <div className="min-w-0">
+
+                  <p className="truncate text-sm font-semibold">
+                    {user.name || "My Account"}
+                  </p>
+
+                  <p className="text-xs text-white/40">
+                    View profile
+                  </p>
+
+                </div>
+
+              </Link>
+
+
+              <button
+                onClick={handleLogout}
+                className="flex w-full items-center gap-4 rounded-xl px-4 py-3 text-sm font-semibold text-white/60 transition hover:bg-red-500/10 hover:text-white"
+              >
+                <span className="text-xl">↪</span>
+                <span>Logout</span>
+              </button>
+            </>
+          ) : (
+            <Link
+              to="/login"
+              onClick={() => setOpen(false)}
+              className="flex items-center gap-4 rounded-xl bg-mustard px-4 py-3 text-sm font-bold text-navy"
+            >
+              <span>👤</span>
+              Sign in
+            </Link>
+          )}
+
+        </div>
+
+      </aside>
+    </>
   );
 }
