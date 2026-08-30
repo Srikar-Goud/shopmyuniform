@@ -1,4 +1,5 @@
-import Anthropic from "@anthropic-ai/sdk";
+import { GoogleGenAI, Type } from "@google/genai";
+
 import {
   searchProducts,
   getProductDetails,
@@ -9,154 +10,285 @@ import {
   getReturnPolicy,
 } from "./tools.js";
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const MODEL = process.env.ANTHROPIC_MODEL || "claude-sonnet-4-6";
+const gemini = new GoogleGenAI({
+  apiKey: process.env.GEMINI_API_KEY,
+});
+
+const MODEL = process.env.GEMINI_MODEL || "gemini-3.5-flash";
 
 // ---------------------------------------------------------------------------
-// Tool schema exposed to the model. Note there is no "userId" parameter on
-// any of the order/delivery tools - the model can never ask for a specific
-// user's data because it cannot supply a user id at all. We inject it
-// server-side when we execute the tool.
+// Gemini function declarations
 // ---------------------------------------------------------------------------
+
 const toolDefinitions = [
   {
     name: "search_products",
     description:
       "Search the product catalog by free-text query, school name, category, and/or gender. Use this when the customer asks whether something is available or wants recommendations.",
-    input_schema: {
-      type: "object",
+    parameters: {
+      type: Type.OBJECT,
       properties: {
-        query: { type: "string", description: "Free text search, e.g. 'white shirt'" },
-        school: { type: "string", description: "School name, e.g. 'St. Mary's School'" },
-        category: {
-          type: "string",
-          enum: ["Shirt", "Trousers", "Skirt", "Pinafore", "Tie", "Sweater", "Blazer", "Shoes", "PE Kit", "Accessory"],
+        query: {
+          type: Type.STRING,
+          description: "Free text search, e.g. 'white shirt'",
         },
-        gender: { type: "string", enum: ["boy", "girl", "unisex"] },
+        school: {
+          type: Type.STRING,
+          description: "School name, e.g. 'St. Mary's School'",
+        },
+        category: {
+          type: Type.STRING,
+          enum: [
+            "Shirt",
+            "Trousers",
+            "Skirt",
+            "Pinafore",
+            "Tie",
+            "Sweater",
+            "Blazer",
+            "Shoes",
+            "PE Kit",
+            "Accessory",
+          ],
+        },
+        gender: {
+          type: Type.STRING,
+          enum: ["boy", "girl", "unisex"],
+        },
       },
     },
   },
+
   {
     name: "get_product_details",
-    description: "Get full details (price, description, available sizes) for a specific product by its id.",
-    input_schema: {
-      type: "object",
-      properties: { productId: { type: "string" } },
+    description:
+      "Get full details including price, description, school, and available sizes for a specific product by its ID.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        productId: {
+          type: Type.STRING,
+          description: "MongoDB product ID",
+        },
+      },
       required: ["productId"],
     },
   },
+
   {
     name: "get_size_guide",
-    description: "Get the size chart / fit guidance for a specific product by its id.",
-    input_schema: {
-      type: "object",
-      properties: { productId: { type: "string" } },
+    description:
+      "Get the size chart and fit guidance for a specific product.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        productId: {
+          type: Type.STRING,
+          description: "MongoDB product ID",
+        },
+      },
       required: ["productId"],
     },
   },
+
   {
     name: "get_my_orders",
-    description: "Get the authenticated customer's own recent orders (order number, status, total, dates). No parameters needed - it is always scoped to whoever is logged in.",
-    input_schema: { type: "object", properties: {} },
+    description:
+      "Get the authenticated customer's own recent orders. No parameters are required because the server automatically identifies the logged-in customer.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {},
+    },
   },
+
   {
     name: "get_order_details",
-    description: "Get full details of one of the authenticated customer's own orders by order number (e.g. 'SMU1024').",
-    input_schema: {
-      type: "object",
-      properties: { orderNumber: { type: "string" } },
+    description:
+      "Get full details of one of the authenticated customer's own orders by order number.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        orderNumber: {
+          type: Type.STRING,
+          description: "Order number such as SMU1024",
+        },
+      },
       required: ["orderNumber"],
     },
   },
+
   {
     name: "get_delivery_info",
-    description: "Get delivery/shipping status and expected delivery date for one of the authenticated customer's own orders.",
-    input_schema: {
-      type: "object",
-      properties: { orderNumber: { type: "string" } },
+    description:
+      "Get delivery status and expected delivery date for one of the authenticated customer's own orders.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {
+        orderNumber: {
+          type: Type.STRING,
+          description: "Order number such as SMU1024",
+        },
+      },
       required: ["orderNumber"],
     },
   },
+
   {
     name: "get_return_policy",
-    description: "Get the store's return/exchange policy (window, conditions, refund timeline).",
-    input_schema: { type: "object", properties: {} },
+    description:
+      "Get the store's return and exchange policy including return window, conditions, and refund timeline.",
+    parameters: {
+      type: Type.OBJECT,
+      properties: {},
+    },
   },
 ];
 
-// Executes a tool call. `userId` always comes from the authenticated
-// request (see chatController.js), never from `input`.
+// ---------------------------------------------------------------------------
+// Execute tool
+// ---------------------------------------------------------------------------
+
 async function executeTool(name, input, userId) {
   switch (name) {
     case "search_products":
-      return searchProducts(input);
+      return await searchProducts(input);
+
     case "get_product_details":
-      return getProductDetails(input);
+      return await getProductDetails(input);
+
     case "get_size_guide":
-      return getSizeGuide(input);
+      return await getSizeGuide(input);
+
     case "get_my_orders":
-      return getUserOrders({ userId });
+      return await getUserOrders({ userId });
+
     case "get_order_details":
-      return getOrderDetails({ userId, orderNumber: input.orderNumber });
+      return await getOrderDetails({
+        userId,
+        orderNumber: input.orderNumber,
+      });
+
     case "get_delivery_info":
-      return getDeliveryInfo({ userId, orderNumber: input.orderNumber });
+      return await getDeliveryInfo({
+        userId,
+        orderNumber: input.orderNumber,
+      });
+
     case "get_return_policy":
-      return getReturnPolicy();
+      return await getReturnPolicy();
+
     default:
-      return { error: `Unknown tool: ${name}` };
+      return {
+        error: `Unknown tool: ${name}`,
+      };
   }
 }
 
-const SYSTEM_PROMPT = `You are the ShopMyUniform customer support agent, embedded in a school-uniform e-commerce site.
+// ---------------------------------------------------------------------------
+// System prompt
+// ---------------------------------------------------------------------------
+
+const SYSTEM_PROMPT = `
+You are the ShopMyUniform customer support agent, embedded in a school-uniform e-commerce site.
 
 Rules:
-- Never invent product, order, price, or delivery information. Always call a tool to look up real data before answering a question about the catalog, sizes, orders, delivery, or returns.
-- You only ever have access to the currently logged-in customer's own orders. You cannot look up another person's orders under any circumstances, and you don't need to ask for a user id - the tools already know who is asking.
-- If a lookup returns no result, say so plainly rather than guessing.
-- Keep answers short, warm, and specific (mention order numbers, sizes, dates, prices from the tool results).
-- For general questions unrelated to the store, gently redirect to how you can help with products, sizing, orders, delivery, or returns.`;
 
-// history: [{role:'user'|'assistant', content:string}, ...] (prior turns)
-// message: the new user message (string)
-// userId: authenticated user's Mongo _id as string
+- Never invent product, order, price, size, stock, or delivery information.
+- Always call the appropriate tool when answering questions about products, sizes, orders, delivery, or returns.
+- You only have access to the currently logged-in customer's own orders.
+- Never ask the customer for a user ID.
+- The server automatically provides the authenticated user's ID to order-related tools.
+- If a lookup returns no result, say so plainly instead of guessing.
+- Keep answers short, warm, and specific.
+- Mention actual product names, order numbers, sizes, dates, prices, and statuses returned by tools.
+- For unrelated questions, gently redirect the customer toward products, sizing, orders, delivery, or returns.
+`;
+
+// ---------------------------------------------------------------------------
+// Main agent
+// ---------------------------------------------------------------------------
+
 export async function runAgent({ history, message, userId }) {
-  const messages = [
-    ...history.map((m) => ({ role: m.role, content: m.content })),
-    { role: "user", content: message },
+  const contents = [
+    ...history.map((m) => ({
+      role: m.role === "assistant" ? "model" : "user",
+      parts: [
+        {
+          text: m.content,
+        },
+      ],
+    })),
+
+    {
+      role: "user",
+      parts: [
+        {
+          text: message,
+        },
+      ],
+    },
   ];
 
-  // Tool-use loop: keep calling the model until it returns a plain text answer.
+  const config = {
+    systemInstruction: SYSTEM_PROMPT,
+
+    tools: [
+      {
+        functionDeclarations: toolDefinitions,
+      },
+    ],
+  };
+
+  // Tool-use loop
   for (let turn = 0; turn < 6; turn++) {
-    const response = await anthropic.messages.create({
+    const response = await gemini.models.generateContent({
       model: MODEL,
-      max_tokens: 1024,
-      system: SYSTEM_PROMPT,
-      tools: toolDefinitions,
-      messages,
+      contents,
+      config,
     });
 
-    const toolUseBlocks = response.content.filter((b) => b.type === "tool_use");
+    // Gemini may request one or multiple functions.
+    const functionCalls = response.functionCalls || [];
 
-    if (toolUseBlocks.length === 0) {
-      const textBlock = response.content.find((b) => b.type === "text");
-      return textBlock ? textBlock.text : "I'm not sure how to help with that - could you rephrase?";
+    // No function call = final answer
+    if (functionCalls.length === 0) {
+      return (
+        response.text ||
+        "I'm not sure how to help with that. Could you rephrase?"
+      );
     }
 
-    // Model wants to use tools: execute them, then continue the conversation.
-    messages.push({ role: "assistant", content: response.content });
+    // IMPORTANT:
+    // Preserve Gemini's complete response content, including function calls
+    // and any thought signatures required by Gemini 3.
+    contents.push(response.candidates[0].content);
 
-    const toolResults = await Promise.all(
-      toolUseBlocks.map(async (block) => {
-        const result = await executeTool(block.name, block.input || {}, userId);
-        return {
-          type: "tool_result",
-          tool_use_id: block.id,
-          content: JSON.stringify(result),
-        };
-      })
-    );
+    // Execute every requested function
+    const functionResponses = [];
 
-    messages.push({ role: "user", content: toolResults });
+    for (const call of functionCalls) {
+      const result = await executeTool(
+        call.name,
+        call.args || {},
+        userId
+      );
+
+      functionResponses.push({
+        functionResponse: {
+          name: call.name,
+          response: {
+            result,
+          },
+          id: call.id,
+        },
+      });
+    }
+
+    // Send tool results back to Gemini
+    contents.push({
+      role: "user",
+      parts: functionResponses,
+    });
   }
 
   return "Sorry, I'm having trouble completing that request right now. Please try again in a moment.";
